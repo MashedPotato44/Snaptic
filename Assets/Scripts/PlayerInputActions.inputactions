@@ -25,7 +25,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Fire",
+                    "name": "Snap",
                     "type": "Button",
                     "id": "3a0f32fd-82ff-4732-bc30-5caf411acd0b",
                     "expectedControlType": "",
@@ -216,7 +216,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Fire",
+                    "action": "Snap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -227,7 +227,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Fire",
+                    "action": "Snap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -238,7 +238,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Touch",
-                    "action": "Fire",
+                    "action": "Snap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -249,7 +249,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Joystick",
-                    "action": "Fire",
+                    "action": "Snap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -260,7 +260,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Fire",
+                    "action": "Snap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -46,6 +46,8 @@ public class PlayerController : MonoBehaviour
         playerControls = new PlayerInputActions();
     }
 
+    public PlayerInputActions GetControls() => playerControls; //creates function for SnapForce scriptto use
+
     private void OnEnable()
     {
         move = playerControls.Player.Move;
