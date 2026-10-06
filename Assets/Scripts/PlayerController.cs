@@ -2,6 +2,8 @@ using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,13 +12,16 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private Vector2 moveDirection = Vector2.zero;
-    public float moveSpeed = 8f;
+    public float moveSpeedx = 10f;
+    public float moveSpeedy = 30f;
     public float jumpVelocity = 10f;
     public float jumpUpGravity = 2.5f;
     public float jumpDownGravity = 3.5f;
     public Vector2 boxSize;
     public float castDistance;
-    
+    [SerializeField] private float acceleration = 60f;
+    [SerializeField] private float deceleration = 40f;
+
     public LayerMask groundLayer;
     public bool grounded; //to check grounding in the inspector
     public bool isHanging;
@@ -28,6 +33,8 @@ public class PlayerController : MonoBehaviour
     public float jumpBufferTimer = 0f;
     public float hangTimer = 0f;
 
+    public bool snapPressed = false;
+
     public bool jumpPressed = false;
     private float jumpReleaseMod = 1.5f;
 
@@ -36,11 +43,16 @@ public class PlayerController : MonoBehaviour
 
     private float fallSpeedMax = -30f;
 
+    public Vector2 gridPos = Vector2Int.zero;
+    public bool cameraMoveFlag = false;
+    public bool cameraMoveStart = false;
+
     [SerializeField] private Rigidbody2D rb;
 
     private InputAction move;
     private InputAction jump;
-    
+    private InputAction snap;
+
     private void Awake()
     {
         playerControls = new PlayerInputActions();
@@ -56,12 +68,19 @@ public class PlayerController : MonoBehaviour
         jump = playerControls.Player.Jump;
         jump.Enable();
         jump.performed += Jump;
+
+        snap = playerControls.Player.Snap;
+        snap.Enable();
+        snap.performed += Snap;
+
+
     }
 
     private void OnDisable()
     {
         move.Disable();
         jump.Disable();
+        snap.Disable();
     }
 
     void Start()
@@ -77,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
         jumpBufferTimer -= Time.deltaTime;
         hangTimer -= Time.deltaTime;
-        
+
         if (isGrounded())
         {
             coyoteTimeCounter = coyoteTime;
@@ -98,8 +117,8 @@ public class PlayerController : MonoBehaviour
             rb.gravityScale = jumpDownGravity;
             isRising = false;
         }
-       
-        if ((Mathf.Abs(rb.linearVelocity.y) < hangVelocityRange) && !grounded)
+
+        if ((Mathf.Abs(rb.linearVelocity.y) < hangVelocityRange) && !grounded) //checks if player is at jump apex
         {
             if (hangTimerSet == false)
             {
@@ -115,37 +134,47 @@ public class PlayerController : MonoBehaviour
                 rb.gravityScale = jumpDownGravity;
             }
         }
-        
+
         if (grounded)
         {
             hangTimerSet = false;
             isHanging = false;
         }
 
-        if (!jumpPressed && rb.linearVelocity.y > 0f)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y / jumpReleaseMod);
-        }
-
-        if (rb.linearVelocity.y < fallSpeedMax)
+        if (rb.linearVelocity.y < fallSpeedMax) //sets terminal velocity
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, fallSpeedMax);
         }
+        
 
-        Debug.Log(rb.linearVelocity.y);
+        if (!jumpPressed && rb.linearVelocity.y > 0f) //adjustable jump
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y / jumpReleaseMod);
+        }
     }
 
     private void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(moveDirection.x * moveSpeed, rb.linearVelocity.y);
-        
-        
-        if (coyoteTimeCounter > 0f && jumpBufferTimer > 0f) 
+        float currentSpeed = rb.linearVelocity.x;
+        float speedTarget = moveDirection.x * moveSpeedx;
+
+        float rate = Mathf.Abs(speedTarget) > Mathf.Abs(currentSpeed) ? acceleration : deceleration; //always brings velocity to movespeedx
+        float speed = Mathf.MoveTowards(currentSpeed, speedTarget, rate * Time.fixedDeltaTime);
+
+        rb.linearVelocity = new Vector2(speed, rb.linearVelocity.y);
+
+
+        if (coyoteTimeCounter > 0f && jumpBufferTimer > 0f)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity); //allows a jump if jump is pressed before buffer timer runs out
         }
 
-     }
+        if (rb.linearVelocity.y > moveSpeedy) //clamps upward velocity
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, moveSpeedy);
+        }
+
+    }
 
     public bool isGrounded() //checks ground is below player
     {
@@ -169,6 +198,18 @@ public class PlayerController : MonoBehaviour
     private void Jump(InputAction.CallbackContext context)
     {
         jumpBufferTimer = jumpBuffer; //resets buffer timer
+    }
+
+    private void Snap(InputAction.CallbackContext context)
+    {
+        snapPressed = true; //sets snap pressed for snap logic
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) //Logs players position when entering a new room
+    {
+        gridPos = new Vector2(collision.transform.position.x, collision.transform.position.y);
+        cameraMoveFlag = true;
+        cameraMoveStart = true;
     }
 }
 

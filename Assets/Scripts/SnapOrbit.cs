@@ -19,7 +19,6 @@ public class SnapOrbit : MonoBehaviour
     {
         Vector3 mousePos = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
         float mouseAngle = Mathf.Atan2(mousePos.y - player.position.y, mousePos.x - player.position.x);
-        Debug.Log(mouseAngle);
         transform.position = new Vector3(
             player.position.x + Mathf.Cos(mouseAngle)*radius, 
             player.position.y + Mathf.Sin(mouseAngle)*radius, 

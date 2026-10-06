@@ -1,20 +1,59 @@
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class SnapForce : MonoBehaviour
 {
-    private PlayerInputActions playerControls;
-    private InputAction snap;
+    [SerializeField] private PlayerController player;
+    [SerializeField] private float radius = 2;
+    [SerializeField] private float objectForce = 5;
+    [SerializeField] private float playerForce = 7;
+    [SerializeField] private LayerMask pushable;
+    [SerializeField] private float velocityYmult = 0.2f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void FixedUpdate()
     {
-        playerControls = GetComponent<PlayerController>().GetControls(); //picks up player controlls from playercontroller
+        if (player.snapPressed)
+        {
+            player.snapPressed = false;
+            PerformSnap();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void PerformSnap()
     {
-        
+        Vector2 origin = transform.position;
+
+        Collider2D[] victims = Physics2D.OverlapCircleAll(origin, radius, pushable);
+
+        foreach (Collider2D victim in victims)
+        {
+            Rigidbody2D rb = victim.attachedRigidbody;
+            if (rb == null) continue;
+
+            Vector2 rb_Pos = rb.transform.position;
+            Vector2 snapDirection = rb_Pos - origin;
+
+            float force;
+
+            if (rb.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                force = playerForce;
+            }
+            else
+            {
+                force = objectForce;
+            }
+
+            Vector2 snapImpulse = force * snapDirection;
+
+            Vector2 currentVel = rb.linearVelocity;
+
+            rb.linearVelocity = new Vector2(currentVel.x, currentVel.y * velocityYmult); //reducing velocity before snap to prevent massive vertical movement
+
+            rb.AddForce(snapImpulse, ForceMode2D.Impulse);
+       
+        }
     }
 }
