@@ -35,19 +35,13 @@ public class MovetoRoom : MonoBehaviour
 
             }
 
-            cameraMoveTimer -= Time.deltaTime;
-            timePassed += Time.deltaTime;
-            //float percentageTime = timePassed / cameraMoveDuration; //generating timebased ratio
-            //float radPos = (Mathf.PI / 2) * percentageTime; //timebased ratio converted to radians
+            cameraMoveTimer -= Time.deltaTime; //tracks camera move time
+            timePassed += Time.deltaTime; //tracks time passed
 
-            //float transformRatio = Mathf.Sin(radPos); //ratio transformed using an exponential
-
-            float transformRatio = ExpMove(timePassed);
-            Debug.Log(transformRatio);
+            float transformRatio = ExpMove(timePassed); //exp ratio
             targetPos = new Vector3(player.gridPos.x + cameraOffset, player.gridPos.y, transform.position.z); //target position calculated with camera offset
             transform.position = Vector3.Lerp(startPos, targetPos, transformRatio); //camera position interpolated
             
-
             
             if (timePassed > cameraMoveDuration) //resets flags once time is up - NEED TO FIND A FIX IF PLAYER MOVES BACK BEFORE TIMER IS FINISHED
             {
@@ -55,10 +49,11 @@ public class MovetoRoom : MonoBehaviour
                 timePassed = 0;
                 startPos = targetPos;
             }
+            
         }
     
     }
-    private float ExpMove(float x)
+    private float ExpMove(float x) //exponential camera
         {
         float y = (1 - Mathf.Exp((-cameraSpeed * x) / cameraMoveDuration)) / (1 - Mathf.Exp(-cameraSpeed));
         return y;

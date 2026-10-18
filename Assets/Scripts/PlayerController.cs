@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
 {
     public PlayerInputActions playerControls;
 
+    [SerializeField] private SnapOrbit snapMarker;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private Vector2 moveDirection = Vector2.zero;
@@ -34,6 +36,10 @@ public class PlayerController : MonoBehaviour
     public float hangTimer = 0f;
 
     public bool snapPressed = false;
+    [SerializeField] private float snapCooldown = 1f;
+    [SerializeField] private float snapCooldownTimer;
+    [SerializeField] private bool snapReady = false;
+    [SerializeField] private bool snapPrimed = false;
 
     public bool jumpPressed = false;
     private float jumpReleaseMod = 1.5f;
@@ -48,6 +54,11 @@ public class PlayerController : MonoBehaviour
     public bool cameraMoveStart = false;
 
     [SerializeField] private Rigidbody2D rb;
+
+    public float bigSnapTimer;
+    public float bigSnapTimerLimit = 2f;
+    public bool roomShiftFlag = false;
+    public bool roomShiftStart = false;
 
     private InputAction move;
     private InputAction jump;
@@ -71,9 +82,8 @@ public class PlayerController : MonoBehaviour
 
         snap = playerControls.Player.Snap;
         snap.Enable();
-        snap.performed += Snap;
-
-
+        snap.performed += SnapPerformed;
+        snap.canceled += SnapReleased;
     }
 
     private void OnDisable()
@@ -96,6 +106,10 @@ public class PlayerController : MonoBehaviour
 
         jumpBufferTimer -= Time.deltaTime;
         hangTimer -= Time.deltaTime;
+
+        snapCooldownTimer -= Time.deltaTime;
+
+        bigSnapTimer -= Time.deltaTime;
 
         if (isGrounded())
         {
@@ -151,6 +165,12 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y / jumpReleaseMod);
         }
+
+        if (!snapMarker.wallFlag)
+        {
+            snapPrimed = false;
+        }
+
     }
 
     private void FixedUpdate()
@@ -174,6 +194,10 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, moveSpeedy);
         }
 
+        if (snapCooldownTimer < 0f && grounded)
+        {
+            snapReady = true;
+        }
     }
 
     public bool isGrounded() //checks ground is below player
@@ -200,17 +224,56 @@ public class PlayerController : MonoBehaviour
         jumpBufferTimer = jumpBuffer; //resets buffer timer
     }
 
-    private void Snap(InputAction.CallbackContext context)
+    private void SnapPerformed(InputAction.CallbackContext context)
     {
-        snapPressed = true; //sets snap pressed for snap logic
+        bigSnapTimer = bigSnapTimerLimit;
+        if (snapMarker.wallFlag)
+        {
+            snapPrimed = true;
+        }
+
+        if (snapReady && !snapMarker.wallFlag)
+        {
+            snapPressed = true; //sets snap pressed for snap logic
+            snapCooldownTimer = snapCooldown;
+            snapReady = false;
+        }
+
     }
+
+    private void SnapReleased(InputAction.CallbackContext context)
+    {
+
+        if (snapPrimed && bigSnapTimer < 0)
+        {
+            roomShiftStart = true;
+            roomShiftFlag = true;
+        }
+
+        else if (snapReady)
+        {
+            snapPressed = true; //sets snap pressed for snap logic
+            snapCooldownTimer = snapCooldown;
+            snapReady = false;
+        }
+            snapPrimed = false;
+    }
+
 
     private void OnTriggerEnter2D(Collider2D collision) //Logs players position when entering a new room
     {
+        if (collision.CompareTag("Wall"))
+        {
+            return;
+        }
+
         gridPos = new Vector2(collision.transform.position.x, collision.transform.position.y);
         cameraMoveFlag = true;
         cameraMoveStart = true;
     }
+
+
+
 }
 
 

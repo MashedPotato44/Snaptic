@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -6,11 +7,12 @@ using UnityEngine.Rendering;
 public class SnapForce : MonoBehaviour
 {
     [SerializeField] private PlayerController player;
-    [SerializeField] private float radius = 2;
-    [SerializeField] private float objectForce = 5;
-    [SerializeField] private float playerForce = 7;
+    [SerializeField] private float radius = 3f;
+    [SerializeField] private float objectForce = 5f;
+    [SerializeField] private float playerForce = 7f;
     [SerializeField] private LayerMask pushable;
     [SerializeField] private float velocityYmult = 0.2f;
+
 
     void FixedUpdate()
     {

@@ -5,6 +5,12 @@ public class SnapOrbit : MonoBehaviour
 {
     [SerializeField] private Transform player;
     [SerializeField] private float radius = 1.5f;
+
+    [SerializeField] private float handOverlapRadius = 0.5f;
+    [SerializeField] private LayerMask layer;
+    public bool wallFlag = false;
+    public Vector2 wallSide;
+
     private Camera cam;
 
 
@@ -24,6 +30,18 @@ public class SnapOrbit : MonoBehaviour
             player.position.y + Mathf.Sin(mouseAngle)*radius, 
             0f
         );
+
+        Collider2D overlap = Physics2D.OverlapCircle(transform.position, handOverlapRadius, layer);
+        if (overlap != null)
+        {
+            wallSide = overlap.offset/overlap.offset.magnitude;
+            wallFlag = true;
+        }
+
+        else
+        {
+            wallFlag = false;
+        }
 
     }
 }
