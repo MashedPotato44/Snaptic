@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public PlayerInputActions playerControls;
 
     [SerializeField] private SnapOrbit snapMarker;
+    [SerializeField] private MovetoRoom cam;
+    [SerializeField] private RoomManager roomManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
@@ -49,11 +52,12 @@ public class PlayerController : MonoBehaviour
 
     private float fallSpeedMax = -30f;
 
-    public Vector2 gridPos = Vector2Int.zero;
+    //public Vector2 gridPos = Vector2Int.zero;
     public bool cameraMoveFlag = false;
     public bool cameraMoveStart = false;
 
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] public Rigidbody2D rb;
+    [SerializeField] private CapsuleCollider2D capsule;
 
     public float bigSnapTimer;
     public float bigSnapTimerLimit = 2f;
@@ -64,6 +68,7 @@ public class PlayerController : MonoBehaviour
     private InputAction jump;
     private InputAction snap;
 
+    public bool isLocked = false;
     private void Awake()
     {
         playerControls = new PlayerInputActions();
@@ -175,6 +180,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+
+        if (isLocked)
+        {
+            return;
+        }
+
         float currentSpeed = rb.linearVelocity.x;
         float speedTarget = moveDirection.x * moveSpeedx;
 
@@ -267,12 +278,14 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        gridPos = new Vector2(collision.transform.position.x, collision.transform.position.y);
+        roomManager.playerPos = new Vector2(collision.transform.position.x, collision.transform.position.y);
+
         cameraMoveFlag = true;
         cameraMoveStart = true;
+
+        cam.targetX = roomManager.playerPos.x;
+        cam.targetY = roomManager.playerPos.y;
     }
-
-
 
 }
 

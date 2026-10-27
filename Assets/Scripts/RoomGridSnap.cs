@@ -4,11 +4,11 @@ using UnityEngine;
 [ExecuteAlways]
 public class RoomGridSnap : MonoBehaviour
 {
+    [SerializeField] private RoomManager roomManager;
 
-    public float roomSize = 28f;
-    public int gridSize = 5;
     public int roomX;
     public int roomY;
+
 
     void Update()
     {
@@ -17,9 +17,9 @@ public class RoomGridSnap : MonoBehaviour
             return;
         }
 
-        roomX = Mathf.Clamp(Mathf.RoundToInt(transform.localPosition.x / roomSize), 0, gridSize - 1);
-        roomY = Mathf.Clamp(Mathf.RoundToInt(transform.localPosition.y / roomSize), 0, gridSize - 1);
-        transform.localPosition = new Vector3(roomX*roomSize, roomY*roomSize, 0f);
+        roomX = Mathf.Clamp(Mathf.RoundToInt(transform.localPosition.x / roomManager.roomSize), 0, roomManager.gridSize - 1);
+        roomY = Mathf.Clamp(Mathf.RoundToInt(transform.localPosition.y / roomManager.roomSize), 0, roomManager.gridSize - 1);
+        transform.localPosition = new Vector3(roomX*roomManager.roomSize, roomY*roomManager.roomSize, 0f);
 
     }
 }

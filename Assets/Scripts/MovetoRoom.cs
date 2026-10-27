@@ -5,18 +5,20 @@ public class MovetoRoom : MonoBehaviour
 {
 
     [SerializeField] private PlayerController player;
+    [SerializeField] private RoomManager roomManager;
 
-    private float cameraOffset;
+    private float cameraOffset = -13.125f;
     private Vector3 targetPos; //Camera Destination
     public float cameraMoveDuration = 0.5f; //Time spent moving
     public float cameraSpeed = 3f;
     private Vector3 startPos; //Camera start
     private float timePassed;
     public float cameraMoveTimer;
+    public float targetX;
+    public float targetY;
     private void Start()
     {
-        startPos = transform.position;
-        cameraOffset = transform.position.x;
+        startPos = new Vector3(roomManager.playerPos.x + cameraOffset, roomManager.playerPos.y, transform.position.z);
     }
     void Update()
     {
@@ -39,7 +41,7 @@ public class MovetoRoom : MonoBehaviour
             timePassed += Time.deltaTime; //tracks time passed
 
             float transformRatio = ExpMove(timePassed); //exp ratio
-            targetPos = new Vector3(player.gridPos.x + cameraOffset, player.gridPos.y, transform.position.z); //target position calculated with camera offset
+            targetPos = new Vector3(targetX + cameraOffset, targetY, transform.position.z); //target position calculated with camera offset
             transform.position = Vector3.Lerp(startPos, targetPos, transformRatio); //camera position interpolated
             
             
