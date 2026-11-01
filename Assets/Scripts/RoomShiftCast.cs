@@ -19,6 +19,7 @@ public class RoomShiftCast : MonoBehaviour
     private float t = 0f;
     private Vector3 endPoint;
     private float speed = 0.2f;
+    private float skinMult = 2f;
 
     void Start()
     {
@@ -30,15 +31,16 @@ public class RoomShiftCast : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.roomShiftStart)
+        if (player.castStart)
         {
+            player.castStart = false;
             int count = capsule.Cast(-snapMarker.wallSide, filter, hits, castDist);
             if (hits[0].distance == 0)
             {
                 hits[0].distance = maxTravel;
             }
             transform.SetParent(roomManager.roomGrid[Mathf.RoundToInt(roomManager.playerPos.x / roomManager.roomSize), Mathf.RoundToInt(roomManager.playerPos.y / roomManager.roomSize)].transform);
-            endPoint = transform.localPosition + new Vector3(-snapMarker.wallSide.x * hits[0].distance, -snapMarker.wallSide.y * hits[0].distance, transform.localPosition.z);
+            endPoint = transform.localPosition + new Vector3((-snapMarker.wallSide.x * hits[0].distance)+(snapMarker.wallSide.x * skinMult), (-snapMarker.wallSide.y * hits[0].distance) + (snapMarker.wallSide.y * skinMult), transform.localPosition.z);
             Debug.Log(transform.localPosition + " " + endPoint);
         }
 
@@ -51,6 +53,7 @@ public class RoomShiftCast : MonoBehaviour
 
         else
         {
+            transform.parent = null;
             LockControls(false);
             t = 0f;
         }

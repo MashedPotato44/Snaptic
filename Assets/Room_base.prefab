@@ -2919,6 +2919,9 @@ MonoBehaviour:
   currentRoomCol: 0
   currentRoomRow: 0
   roomShiftTimer: 0
+  roomFallFlag: 0
+  roomFallStart: 0
+  fallDist: 0
 --- !u!114 &1250435718033620153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2932,6 +2935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomManager: {fileID: 0}
+  roomInfo: {fileID: 4982159838530034631}
 --- !u!1 &6158551599120792140
 GameObject:
   m_ObjectHideFlags: 0

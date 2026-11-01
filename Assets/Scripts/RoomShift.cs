@@ -24,7 +24,12 @@ public class RoomShift : MonoBehaviour
     private float xPos;
     private float yPos;
     private float transformRatio;
- 
+
+    public bool roomFallFlag = false;
+    public bool roomFallStart = false;
+    public int fallDist = 0;
+    public int fallOldCol;
+    public int fallOldRow;
 
     private void Start()
     {

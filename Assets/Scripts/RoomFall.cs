@@ -1,25 +1,37 @@
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class RoomFall : MonoBehaviour
 {
     [SerializeField] RoomManager roomManager;
-    private int currentRoomCol;
-    private int currentRoomRow;
+    [SerializeField] RoomShift roomInfo;
+
+    private Vector3 landingPoint;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentRoomCol = Mathf.RoundToInt(transform.position.x / roomManager.roomSize);
-        currentRoomRow = Mathf.RoundToInt(transform.position.y / roomManager.roomSize);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (roomManager.roomFallFlag)
+        if (roomInfo.roomFallFlag)
+            if (roomInfo.roomFallStart)
+            {
+                roomInfo.roomFallStart = false;
+                roomManager.roomGrid[roomInfo.currentRoomCol, roomInfo.currentRoomRow] = roomInfo;
+                roomManager.roomGrid[roomInfo.fallOldCol, roomInfo.fallOldRow] = null;
+            }
+
+        if (roomInfo.roomFallFlag)
         {
-            roomManager.roomFallFlag = false;
-            Debug.Log("Let the room " + roomManager.fallRoomX + " " + roomManager.fallRoomY + " fall");
+            roomInfo.roomFallFlag = false;
+            Debug.Log("Room landing in " + roomInfo.currentRoomCol + " " + roomInfo.currentRoomRow + " by falling " + roomInfo.fallDist);
         }
+
     }
+
+
 }

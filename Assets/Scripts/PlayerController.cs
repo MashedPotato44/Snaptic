@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviour
     public float bigSnapTimerLimit = 2f;
     public bool roomShiftFlag = false;
     public bool roomShiftStart = false;
+    public bool castStart = false;
 
     private InputAction move;
     private InputAction jump;
@@ -259,6 +260,7 @@ public class PlayerController : MonoBehaviour
         {
             roomShiftStart = true;
             roomShiftFlag = true;
+            castStart = true;
         }
 
         else if (snapReady)

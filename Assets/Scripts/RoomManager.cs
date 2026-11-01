@@ -1,6 +1,7 @@
 using Unity.VisualScripting;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class RoomManager : MonoBehaviour
 
@@ -9,9 +10,7 @@ public class RoomManager : MonoBehaviour
     public float roomSize = 32f;
     public RoomShift[,] roomGrid;
     public Vector2 playerPos;
-    public bool roomFallFlag;
-    public int fallRoomX;
-    public int fallRoomY;
+    public int fallCounter = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -38,20 +37,34 @@ public class RoomManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         for (int row = 1; row < gridSize; row++)
+        {
             for (int col = 0; col < gridSize; col++)
-                if (roomGrid[col,row - 1] == false && roomGrid[col,row] == true)
+            {
+                if (roomGrid[col, row - 1] == null && roomGrid[col, row] != null)
                 {
-                    roomFallFlag = true;
-                    fallRoomX = col;
-                    fallRoomY = row;
+                    for (int i = row - 1; i >= 0; i--)
+                    {
+                        if (roomGrid[col, i] == null)
+                        {
+                            fallCounter++;
+
+                        }
+                    }
+
+                    roomGrid[col, row].fallOldCol = col;
+                    roomGrid[col, row].fallOldRow = row;
+                    roomGrid[col, row].SetCoord(col, row - fallCounter);
+                    roomGrid[col, row].fallDist = fallCounter;
+                    roomGrid[col, row].roomFallFlag = true;
+                    roomGrid[col, row].roomFallStart = true;
+                    fallCounter = 0;
+                  
                 }
-
-        
-        
-
-        //Debug.Log(roomGrid[0,0] + " " + roomGrid[1, 0] + " " + roomGrid[2, 0] + " " + roomGrid[0, 1] + " " + roomGrid[1, 1] + " " + roomGrid[2, 1] + " " + roomGrid[0, 2] + " " + roomGrid[1, 2] + " " + roomGrid[2, 2]);
+            }
+        }
+        Debug.Log(roomGrid[0,0] + "," + roomGrid[1, 0] + "," + roomGrid[2, 0] + "," + roomGrid[0, 1] + "," + roomGrid[1, 1] + "," + roomGrid[2, 1] + "," + roomGrid[0, 2] + "," + roomGrid[1, 2] + "," + roomGrid[2, 2]);
     }
 
 }
